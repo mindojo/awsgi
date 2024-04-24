@@ -117,27 +117,50 @@ def environ(event, context):
     # FIXME: Flag the encoding in the headers
     body = convert_byte(body)
 
-    environ = {
-        'REQUEST_METHOD': event['httpMethod'],
-        'SCRIPT_NAME': '',
-        'SERVER_NAME': '',
-        'SERVER_PORT': '',
-        'PATH_INFO': event['path'],
-        'QUERY_STRING': urlencode(event['queryStringParameters'] or {}),
-        'REMOTE_ADDR': '127.0.0.1',
-        'CONTENT_LENGTH': str(len(body)),
-        'HTTP': 'on',
-        'SERVER_PROTOCOL': 'HTTP/1.1',
-        'wsgi.version': (1, 0),
-        'wsgi.input': BytesIO(body),
-        'wsgi.errors': sys.stderr,
-        'wsgi.multithread': False,
-        'wsgi.multiprocess': False,
-        'wsgi.run_once': False,
-        'wsgi.url_scheme': '',
-        'awsgi.event': event,
-        'awsgi.context': context,
-    }
+    if event.get('version', '1.0') == '2.0':
+        environ = {
+            'REQUEST_METHOD': event['requestContext']['http']['method'],
+            'SCRIPT_NAME': '',
+            'SERVER_NAME': '',
+            'SERVER_PORT': '',
+            'PATH_INFO': event['rawPath'],
+            'QUERY_STRING': urlencode(event['rawQueryString'] or {}),
+            'REMOTE_ADDR': '127.0.0.1',
+            'CONTENT_LENGTH': str(len(body)),
+            'HTTP': 'on',
+            'SERVER_PROTOCOL': 'HTTP/1.1',
+            'wsgi.version': (1, 0),
+            'wsgi.input': BytesIO(body),
+            'wsgi.errors': sys.stderr,
+            'wsgi.multithread': False,
+            'wsgi.multiprocess': False,
+            'wsgi.run_once': False,
+            'wsgi.url_scheme': '',
+            'awsgi.event': event,
+            'awsgi.context': context,
+        }
+    else:
+        environ = {
+            'REQUEST_METHOD': event['httpMethod'],
+            'SCRIPT_NAME': '',
+            'SERVER_NAME': '',
+            'SERVER_PORT': '',
+            'PATH_INFO': event['path'],
+            'QUERY_STRING': urlencode(event['queryStringParameters'] or {}),
+            'REMOTE_ADDR': '127.0.0.1',
+            'CONTENT_LENGTH': str(len(body)),
+            'HTTP': 'on',
+            'SERVER_PROTOCOL': 'HTTP/1.1',
+            'wsgi.version': (1, 0),
+            'wsgi.input': BytesIO(body),
+            'wsgi.errors': sys.stderr,
+            'wsgi.multithread': False,
+            'wsgi.multiprocess': False,
+            'wsgi.run_once': False,
+            'wsgi.url_scheme': '',
+            'awsgi.event': event,
+            'awsgi.context': context,
+        }
     headers = event.get('headers', {}) or {}
     for k, v in headers.items():
         k = k.upper().replace('-', '_')
