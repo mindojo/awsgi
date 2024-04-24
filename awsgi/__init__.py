@@ -131,7 +131,7 @@ def environ(event, context):
             "SERVER_NAME": "",
             "SERVER_PORT": "",
             "PATH_INFO": event["requestContext"]["http"]["path"],
-            "QUERY_STRING": urlencode(event["queryStringParameters"] or {}),
+            "QUERY_STRING": event.get("rawQueryString", ""),
             "REMOTE_ADDR": "127.0.0.1",
             "CONTENT_LENGTH": str(len(body)),
             "HTTP": "on",
